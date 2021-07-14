@@ -1,4 +1,3 @@
-
 package Cursos;
 
 import java.io.Serializable;
@@ -9,7 +8,7 @@ public class Cursos implements Serializable{
     private int creditos;
     private int alumnos;
     private int profesor;
-    
+
     public Cursos() {
         this.codigo = 0;
         this.nombre = "";

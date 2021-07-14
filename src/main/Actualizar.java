@@ -18,7 +18,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import static main.Principal.ag;
 
 /**
  *
@@ -27,37 +26,16 @@ import static main.Principal.ag;
 public class Actualizar extends JFrame {
 
     private JPanel panel;
-    public JTextField txtcodigo, txtnombre, txtapellido, txtcorreo, txtcontra;
+    public static JTextField txtcodigo, txtnombre, txtapellido, txtcorreo, txtcontra;
     private JLabel titulo, nombre, apellido, codigo, correo, contra, genero;
-    private JComboBox combo;
-    public JButton actu, buscar;
-    
-    AgregarProfesores actprofesor = new AgregarProfesores();
-    public static PanelProfesor metodo = new PanelProfesor();
-    Principal princ = new Principal();
-    private int indicador;
-    CrearProfesores aux;
-    public static PanelProfesor ta = new PanelProfesor();
-    public static int numprofes;
+    public static JComboBox combo;
+    public JButton actu;
 
     public Actualizar() {
 
         setLocationRelativeTo(null);
         setSize(400, 400);
         componentes();
-    }
-    public Actualizar(String cod,String nombre, String apellido,String correo,String contra,int gen) {
-
-        setLocationRelativeTo(null);
-        setSize(400, 400);
-        componentes();
-        txtcodigo.setText(cod);
-        txtcodigo.setEnabled(false);
-        txtnombre.setText(nombre);
-        txtapellido.setText(apellido);
-        txtcorreo.setText(correo);
-        txtcontra.setText(contra);
-        combo.setSelectedIndex(gen);
     }
 
     private void panel() {
@@ -80,6 +58,8 @@ public class Actualizar extends JFrame {
         txtapellido.setBounds(100, 125, 200, 25);
         txtcorreo.setBounds(100, 165, 200, 25);
         txtcontra.setBounds(100, 205, 200, 25);
+
+        txtcodigo.setEnabled(false);
 
         panel.add(txtcodigo);
         panel.add(txtnombre);
@@ -119,7 +99,6 @@ public class Actualizar extends JFrame {
         etiquetas();
         combox();
         actualizar();
-
     }
 
     private void combox() {
@@ -135,104 +114,39 @@ public class Actualizar extends JFrame {
 
         actu = new JButton("Actualizar");
         actu.setBounds(137, 285, 125, 25);
-        buscar = new JButton("Buscar");
-        buscar.setBounds(260, 20, 100, 25);
-        panel.add(buscar);
+       // panel.add(buscar);
         panel.add(actu);
-
-        ActionListener acc = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent ae) {
-                if ("".equals(txtcodigo.getText())) {
-                    JOptionPane.showMessageDialog(null, "Por favor ingrese el código correcto");
-                } else {
-                    for (int i = 0; i < ag.profes.length; i++) {
-                        if (ag.profes[i].getCodigo() == Integer.parseInt(txtcodigo.getText())) {
-                            indicador =i;
-                            //System.out.println("Posicion profe"+indicador);
-                            buscar(i);
-                            break;
-                        }
-
-                    }
-                    for (int i = 0; i < ag.profes.length; i++) {
-                        if(ag.profes[i]==null){
-                            numprofes =i;
-                            break;
-                        }
-                        
-                    }
-                    
-
-                }
-            }
-
-        };
-        buscar.addActionListener(acc);
-        ActionListener acc2 = new ActionListener() {
+         ActionListener acc2 = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
                 String g = "";
                 if (combo.getSelectedIndex() == 1) {
-                    g = "M";
+                    g = "m";
                 } else if (combo.getSelectedIndex() == 2) {
-                    g = "F";
+                    g = "f";
                 }
-                metodo.actualizarfila(txtcodigo.getText(), txtnombre.getText(), txtapellido.getText(), txtcorreo.getText(), g);
-                //System.out.println(actprofesor.x);
-                ag.profes[indicador].setCodigo(Integer.parseInt(txtcodigo.getText()));
-                ag.profes[indicador].setNombre(txtnombre.getText());
-                ag.profes[indicador].setApellido(txtapellido.getText());
-                ag.profes[indicador].setCorreo(txtcorreo.getText());
-                ag.profes[indicador].setGenero(g);
-                
-                
-                for (int i = 0; i < numprofes; i++) {
-                    aux = ag.profes[i];
-                   // System.out.println(ag.profes[i].getNombre());
-                    try {
-                        if(i==0){
-                            princ.ser(aux);
-                        }else{
-                    princ.ser2(aux);}
-                } catch (IOException ex) {
-                    Logger.getLogger(AgregarProfesores.class.getName()).log(Level.SEVERE, null, ex);
+                PanelProfesor.actualizarfila(txtcodigo.getText(), txtnombre.getText(), txtapellido.getText(), txtcorreo.getText(), g);
+                for (CrearProfesores prof: AgregarProfesores.profes) {
+                    if (prof.getCodigo()==Integer.parseInt(txtcodigo.getText())){
+                        prof.setCodigo(Integer.parseInt(txtcodigo.getText()));
+                        prof.setNombre(txtnombre.getText());
+                        prof.setApellido(txtapellido.getText());
+                        prof.setCorreo(txtcorreo.getText());
+                        prof.setGenero(g);
+                        break;
+                    }
                 }
-                try {
-                    princ.carnt();
-                } catch (IOException ex) {
-                    Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                txtcodigo.setEnabled(true);
                 txtcodigo.setText("");
                 txtnombre.setText("");
                 txtapellido.setText("");
                 txtcorreo.setText("");
                 txtcontra.setText("");
+                Cargas.Serializar.serializar(AgregarProfesores.profes,"profesores.bin",false);
             }
-                //metodo.ColocarGrafica();
-                }
+
                 
         };
         actu.addActionListener(acc2);
-    }
-
-    public void buscar(int i) {
-        int j = 0;
-        if ("m".equals(ag.profes[i].getGenero())) {
-            j = 1;
-        } else {
-            j = 2;
-        }
-        txtcodigo.setEnabled(false);
-        txtnombre.setText(ag.profes[i].getNombre());
-        txtapellido.setText(ag.profes[i].getApellido());
-        txtcorreo.setText(ag.profes[i].getCorreo());
-        txtcontra.setText(ag.profes[i].getContraseña());
-        combo.setSelectedIndex(j);
-
     }
 
 }

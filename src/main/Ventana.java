@@ -1,15 +1,9 @@
 package main;
 
-import ModuloProfes.AdminCurso;
-import ModuloProfes.ModActualizar;
-import ModuloProfes.ModProfesor;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -17,30 +11,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
-import static main.Principal.ag;
-import static main.Principal.agcursos1;
-
 public class Ventana extends JFrame {
 
     private JPanel panel;
     public JTextField txtcodigo;
     private JPasswordField txtcontra;
-    Admin administrar = new Admin();
-    AdminProfesores mod = new AdminProfesores();
-    Principal prin = new Principal();
-    ModActualizar modactu = new ModActualizar(); //Nuevo objeto (cambiado 11:58)
-    public String user = "", con = "";
-    public int[] gi = new int[1];
-    AdminCurso adcurso = new AdminCurso();
 
-    public String getUser() {
-        return user;
-    }
-
-    public void setUser(String user) {
-        this.user = user;
-    }
-    ModProfesor modprofe = new ModProfesor();
 
     public Ventana() {
         setSize(600, 400); //Tamaño de la ventana
@@ -49,15 +25,6 @@ public class Ventana extends JFrame {
         IniciarComponentes();
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setTitle("DTT");
-        try {
-            prin.car();
-            prin.cargaCursos();
-            prin.caralumnos();
-        } catch (IOException ex) {
-            Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
 
     private void IniciarComponentes() {
@@ -96,19 +63,11 @@ public class Ventana extends JFrame {
         ActionListener accion = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-                boolean f = false;
-
-                user = txtcodigo.getText();
-                con = txtcontra.getText();
-                //buscar(user, con);
                 if ("admin".equals(txtcodigo.getText()) && "admin".equals(txtcontra.getText())) {
                     dispose();
-                    administrar.setVisible(true);
-                    f = true;
-                } else if (f == false) {
-                    buscar(user, con);
-                } else {
-
+                    Admin admin = new Admin();
+                    admin.setVisible(true);
+                }  else {
                     JOptionPane.showMessageDialog(null, "Datos erróneos, Porfavor inténtelo de nuevo");
                     txtcodigo.setText("");
                     txtcontra.setText("");
@@ -130,7 +89,7 @@ public class Ventana extends JFrame {
         panel.add(txtcodigo);
         panel.add(txtcontra);
     }
-
+/*
     private void buscar(String user, String con) {
         try {
             prin.carnt();
@@ -140,12 +99,6 @@ public class Ventana extends JFrame {
             Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
         }
         int contador = 0;
-//        if (user.equals(txtcodigo.getText()) && con.equals(txtcontra.getText())) {
-//                    dispose();
-//                    administrar.setVisible(true);
-//
-//                }else{
-        //System.out.println(user + "  " + con);
         while (contador < 50) {
             if (ag.profes[contador] == null) {
                 //System.out.println("nada" + contador);
@@ -155,12 +108,9 @@ public class Ventana extends JFrame {
                 break;
             }
             if (ag.profes[contador].getCodigo() == Integer.parseInt(user)) {
-                //System.out.println("Compara User");
                 if (con.equals(ag.profes[contador].getContraseña())) {
-                    //System.out.println("Compara contra");
-                    //modprofe.comparar(Integer.parseInt(user));
-                    //ModProfesor model = new ModProfesor(Integer.parseInt(user));
                     bot(Integer.parseInt(user));
+                    profe = user;
                     gi[0] = Integer.parseInt(user);
 
                     dispose();
@@ -180,44 +130,29 @@ public class Ventana extends JFrame {
         JButton[] boton2 = new JButton[50];
         for (int i = 0; i < agcursos1.nuevocurso.length; i++) {
             if (agcursos1.nuevocurso[i] == null) {
-                //System.out.println("Mal");
                 break;
             }
             if (agcursos1.nuevocurso[i].getProfesores() == cod) {
-                boton2[i] = new JButton();
-                boton2[i].setText(agcursos1.nuevocurso[i].getNombre());
-                boton2[i].setEnabled(true);
-                boton2[i].setBounds(260, (20 + 50 * contador), 200, 25);
-                boton2[i].addActionListener(new ActionListener() {
+                ModProfesor.boton[contador] = new JButton();
+                ModProfesor.clases[contador] = new JLabel();
+                ModProfesor.boton[contador].setText(agcursos1.nuevocurso[i].getNombre());
+                curso = agcursos1.nuevocurso[i].getNombre();
+                ModProfesor.clases[contador].setText(curso);
+                //System.out.println(boton2[contador].getText()+"contador: "+contador);
+                ModProfesor.boton[contador].setEnabled(true);
+                ModProfesor.boton[contador].setBounds(260, (20 + 50 * contador), 200, 25);
+                ModProfesor.boton[contador].addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
+                        adcurso = new AdminCurso();
                         adcurso.setVisible(true);
                     }
-                });
-                modprofe.panel.add(boton2[i]);
+                }); 
+                modprofe.panel.add(ModProfesor.boton[contador]);
                 contador++;
             }
         }
 
     }
 
-    public void actuali() {
-
-        for (int i = 0; i < ag.profes.length; i++) {
-            if (ag.profes[i].getCodigo() == Integer.parseInt(user)) {
-
-                //System.out.println("Posicion profe" + i);
-                modactu.buscar(i);
-                break;
-            }
-
-        }
-//        for (int i = 0; i < ag.profes.length; i++) {
-//            if (ag.profes[i] == null) {
-//                numprofes = i;
-//                break;
-//            }
-//        }
-
-    }
-
+*/
 }

@@ -1,23 +1,13 @@
+
 package Cursos;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.*;
+
 import main.AgregarProfesores;
-import main.Principal;
-import static main.Principal.ag;
+import main.CrearProfesores;
 import main.panelcursos;
 
 public class AgregarCursos extends JFrame {
@@ -25,26 +15,15 @@ public class AgregarCursos extends JFrame {
     private JPanel panel;
     public JTextField txtcodigo, txtnombre, txtcreditos;
     private JLabel titulo, codigo, nombre, creditos, profesor;
-    private JComboBox combo;
-    public JButton agregar;
-
-//    public static panelcursos panelcursos = new panelcursos();
-    public AgregarProfesores agprofes = new AgregarProfesores();
-    Object[] obj = new Object[5];
-    Principal prin = new Principal();
-    Cursos curso,curso1;
-
-    private int x;
-
-    public  Cursos[] nuevocurso = new Cursos[50];
+    private  JComboBox combo;
+    private JButton agregar;
+    public static Cursos[] nuevocurso = new Cursos[50];
+    public static int x;
 
     public AgregarCursos() {
-
         setLocationRelativeTo(null);
         setSize(400, 300);
         componentes();
-        
-
     }
 
     private void panel() {
@@ -97,114 +76,63 @@ public class AgregarCursos extends JFrame {
     }
 
     public void combo2() {
-
         combo = new JComboBox();
+        comboProfes();
         combo.setBounds(100, 170, 200, 25);
-        try {
-            prin.carnt();
-        } catch (IOException ex) {
-            Logger.getLogger(AgregarCursos.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(AgregarCursos.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        for (int i = 0; i < ag.profes.length; i++) {
-            if (ag.profes[i] == null) {
-               // System.out.println("Vacío");
-
-                break;
-            } else {
-                combo.addItem(ag.profes[i].getNombre() + " " + ag.profes[i].getApellido());
-                //System.out.println(ag.profes[i].getNombre());
-                //combo.addItem("Hola");
-            }
-
-        }
-
         panel.add(combo);
     }
 
-    public void agregar() {
-        x = 0;
+    public void comboProfes() {
+        CrearProfesores[] aux = (CrearProfesores[]) Cargas.Serializar.getSerializable("profesores.bin");
+        for (int i = 0; i < aux.length; i++) {
+            if (aux[i] != null) {
+                combo.addItem(aux[i].getNombre() + " " + aux[i].getApellido());
+            }
+        }
+    }
 
+    public void agregar() {
         agregar = new JButton("Agregar");
         agregar.setBounds(137, 210, 125, 25);
         panel.add(agregar);
         ActionListener accion = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-                String maestro = "Fulano";
-                maestro = ag.profes[combo.getSelectedIndex()].getNombre() + " " + ag.profes[combo.getSelectedIndex()].getApellido();
-                nuevocurso[x] = new Cursos(Integer.parseInt(txtcodigo.getText()), txtnombre.getText(), Integer.parseInt(txtcreditos.getText()), Integer.parseInt(txtcodigo.getText()), combo.getSelectedIndex());
-                curso = nuevocurso[x];
-                obj[0] = nuevocurso[x].getCodigo();
-                obj[1] = nuevocurso[x].getNombre();
-                obj[2] = nuevocurso[x].getCreditos();
-                obj[3] = nuevocurso[x].getAlumnos();
-                obj[4] = nuevocurso[x].getProfesores();
-                panelcursos.anadirfila(obj);
-                try {
-                    ser2(curso);
-                } catch (IOException ex) {
-                    Logger.getLogger(AgregarCursos.class.getName()).log(Level.SEVERE, null, ex);
+               if (!vacio()){
+                    System.out.println(combo.getSelectedIndex());
+                    nuevocurso[x] = new Cursos(
+                                            Integer.parseInt(txtcodigo.getText()),
+                                            txtnombre.getText(),
+                                            Integer.parseInt(txtcreditos.getText()),
+                                            0,
+                                            AgregarProfesores.profes[combo.getSelectedIndex()].getCodigo());
+                    Object[] obj = new Object[5];
+                    obj[0] = nuevocurso[x].getCodigo();
+                    obj[1] = nuevocurso[x].getNombre();
+                    obj[2] = nuevocurso[x].getCreditos();
+                    obj[3] = nuevocurso[x].getAlumnos();
+                    obj[4] = AgregarProfesores.profes[combo.getSelectedIndex()].getNombre()
+                    + AgregarProfesores.profes[combo.getSelectedIndex()].getApellido();
+                    panelcursos.anadirfila(obj);
+                    Cargas.Serializar.serializar(nuevocurso,"cursos.bin",false);
+                    x++;
+                    txtcodigo.setText("");
+                    txtcreditos.setText("");
+                    txtnombre.setText("");
+                    combo.setSelectedIndex(0);
                 }
-                x++;
             }
         };
         agregar.addActionListener(accion);
 
     }
-
-    private void ser2(Cursos objetos) throws FileNotFoundException, IOException {
-        ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream("Cursos.bin", true));
-        os.writeObject(objetos);  // this es de tipo DatoUdp
-        os.close();
+    private boolean vacio(){
+        if (txtcodigo.getText().equals("")||txtnombre.getText().equals("")||txtcreditos.getText().equals("")){
+            JOptionPane.showMessageDialog(null,"Algún campo está vacío");
+            return true;
+        }
+        return false;
     }
-    public int obtenerpo(){
-        int num=0; 
-        for (int i = 0; i < nuevocurso.length; i++) {
-            if (nuevocurso[i] == null){
-                num=i;
-                break;
-            }
-            
-        }
-        System.out.println(num);
-         return num;
-     }
-    
-    public void igual(Cursos[] poc) {
-         int h=obtenerpo();
-         int x=0;
-         if (h==0)
-         {
-             for (int j = 0; j < poc.length; j++) {
-            nuevocurso[j] = poc[j];
-           // System.out.println(nuevocurso[j].getNombre());
-            //System.out.println("No marcy");
-             curso1 = nuevocurso[j];
-        try {
-                    ser2(curso1);
-                } catch (IOException ex) {
-                    Logger.getLogger(AgregarCursos.class.getName()).log(Level.SEVERE, null, ex);
-                }
-        }
-             
-         }else{
-        for (int j = 0; j < h; j++) {
 
-            nuevocurso[h] = poc[h-1];
-            //System.out.println(nuevocurso[h].getNombre());
-            //System.out.println("vaci");
-             curso1 = nuevocurso[h];
-        try {
-                    ser2(curso1);
-                } catch (IOException ex) {
-                    Logger.getLogger(AgregarCursos.class.getName()).log(Level.SEVERE, null, ex);
-                }
-        }
-         }
-       
-    }
-  
 
 }

@@ -1,19 +1,11 @@
 package main;
 
+import Cursos.AgregarCursos;
+
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import static main.Principal.ag;
-import static main.Principal.i;
+import javax.swing.*;
 
 /**
  *
@@ -26,18 +18,12 @@ public class AgregarProfesores extends JFrame {
     private JLabel titulo, nombre, apellido, codigo, correo, contra, genero;
     private JComboBox combo;
     public JButton agregar;
-    CrearProfesores profe, aux;
-    PanelProfesor pan;
-    public CrearProfesores[] profes = new CrearProfesores[50];
-    static PanelProfesor p = new PanelProfesor();
+    public static CrearProfesores[] profes = new CrearProfesores[50];
     Object[] os = new Object[6];
-    Principal prin = new Principal();
     public static Actualizar act = new Actualizar();
-    //static AgregarCursos agcursos = new AgregarCursos();;
-    public int x;
+    public static int x=0;
 
     public AgregarProfesores() {
-
         setLocationRelativeTo(null);
         setSize(400, 400);
         componentes();
@@ -116,108 +102,60 @@ public class AgregarProfesores extends JFrame {
     }
 
     public void agregar() {
-        
-        x = igual();
         agregar = new JButton("Agregar");
         agregar.setBounds(137, 285, 125, 25);
         panel.add(agregar);
         ActionListener accion = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-
-                txtcodigo.setEnabled(true);
-
-                String g = "";
-                if (combo.getSelectedIndex() == 1) {
-                    g = "m";
-                } else if (combo.getSelectedIndex() == 2) {
-                    g = "f";
+                System.out.println("Cantidad X: "+x);
+                if (x<50){
+                if (!vacio()){
+                    String g = "";
+                    if (combo.getSelectedIndex() == 1) {
+                        g = "m";
+                    } else if (combo.getSelectedIndex() == 2) {
+                        g = "f";
+                    }
+                    try{
+                    profes[x] = new CrearProfesores(Integer.parseInt(txtcodigo.getText()), txtnombre.getText(), txtapellido.getText(), txtcorreo.getText(), txtcontra.getText(), g);
+                    os[0] = profes[x].getCodigo();
+                    os[1] = profes[x].getNombre();
+                    os[2] = profes[x].getApellido();
+                    os[3] = profes[x].getCorreo();
+                    os[4] = profes[x].getGenero();
+                    os[5] = profes[x].getContraseña();
+                    PanelProfesor.anadirfila(os);
+                    if (profes[x].getGenero().equals("m"))
+                        PanelProfesor.conH++;
+                        PanelProfesor.aniadirGrafica(PanelProfesor.dataset,"Hombres",PanelProfesor.conH);
+                    if (profes[x].getGenero().equals("f"))
+                        PanelProfesor.conM++;
+                        PanelProfesor.aniadirGrafica(PanelProfesor.dataset,"Mujeres",PanelProfesor.conM);
+                    txtcodigo.setText("");
+                    txtnombre.setText("");
+                    txtapellido.setText("");
+                    txtcorreo.setText("");
+                    txtcontra.setText("");
+                    combo.setSelectedIndex(0);
+                    Cargas.Serializar.serializar(profes,"profesores.bin",false);
+                    x++;
+                    } catch (Exception e){
+                        JOptionPane.showMessageDialog(null,"Algún dato es erróneo");
+                    }
                 }
-                System.out.println(x);
-                profes[x] = new CrearProfesores(Integer.parseInt(txtcodigo.getText()), txtnombre.getText(), txtapellido.getText(), txtcorreo.getText(), txtcontra.getText(), g);
-                //aux = new CrearProfesores(Integer.parseInt(txtcodigo.getText()),txtnombre.getText(),txtapellido.getText(),txtcorreo.getText(),txtcontra.getText(),g);
-                aux = profes[x];
-                //profes.add(profe);
-
-                // aux = (CrearProfesores)profes.get(i);
-                os[0] = profes[x].getCodigo();
-                os[1] = profes[x].getNombre();
-                os[2] = profes[x].getApellido();
-                os[3] = profes[x].getCorreo();
-                os[4] = profes[x].getGenero();
-                os[5] = profes[x].getContraseña();
-                p.anadirfila(os);
-                txtcodigo.setText("");
-                txtnombre.setText("");
-                txtapellido.setText("");
-                txtcorreo.setText("");
-                txtcontra.setText("");
-                combo.setSelectedIndex(0);
-                try {
-                    // prin.ser(profes);
-                    
-                    prin.ser2(aux);
-                    
-                } catch (IOException ex) {
-                    Logger.getLogger(AgregarProfesores.class.getName()).log(Level.SEVERE, null, ex);
+                }else{
+                    JOptionPane.showMessageDialog(null,"Cantidad máxima de Profesores");
                 }
-                try {
-                    prin.carnt();
-                } catch (IOException ex) {
-                    Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
-                }
-
-                x++;
-                //act.numprofes =x;
-                System.out.println(x);
-                
             }
         };
         agregar.addActionListener(accion);
-
     }
-
-    public void actualizar(int i) {
-        int j = 0;
-        if ("m".equals(ag.profes[i].getGenero())) {
-            j = 1;
-        } else {
-            j = 2;
+    public boolean vacio(){
+        if (txtcodigo.equals("") || txtnombre.equals("")|| txtapellido.equals("") || txtcorreo.equals("") ||txtcontra.equals("")|| combo.getSelectedIndex()==0){
+            JOptionPane.showMessageDialog(null,"Algún campo está vacío");
+            return true;
         }
-        txtcodigo.setEnabled(false);
-        txtcodigo.setText(i + "");
-        txtnombre.setText(ag.profes[i].getNombre());
-        txtapellido.setText(ag.profes[i].getApellido());
-        txtcorreo.setText(ag.profes[i].getCorreo());
-        txtcontra.setText(ag.profes[i].getContraseña());
-        combo.setSelectedIndex(j);
+        return false;
     }
-
-    public int igual() {
-        for (int j = 0; j < i; j++) {
-            if (j==50){
-                    break;
-                }
-            profes[j] = ag.profes[i];
-
-        }
-        return i;
-    }
-    public void igualar(CrearProfesores[] cp){
-       
-        for (int j = 0; j < cp.length; j++) {
-            profes[j] = cp[j];
-            profes[j].setContraseña("1234");
-            try {
-                    // prin.ser(profes);
-                    
-                    prin.ser2(profes[j]);
-                    
-                } catch (IOException ex) {
-                    Logger.getLogger(AgregarProfesores.class.getName()).log(Level.SEVERE, null, ex);
-                }
-        }
-     }
 }

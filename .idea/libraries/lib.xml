@@ -1,0 +1,23 @@
+<component name="libraryTable">
+  <library name="lib">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/dist/lib/pdftest-7.1.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/jcommon-1.0.23.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/hyph-7.1.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/sign-7.1.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/font-asian-7.1.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/forms-7.1.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/barcodes-7.1.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/jfreechart-1.0.19.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/pdfa-7.1.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/layout-7.1.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/kernel-7.1.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/gson-2.2.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/io-7.1.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/slf4j-api-1.7.25.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/slf4j-simple-1.7.25.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

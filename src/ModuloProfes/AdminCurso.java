@@ -16,7 +16,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import static javax.swing.JFrame.EXIT_ON_CLOSE;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -24,7 +23,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
-import static main.Principal.agalumno;
+import main.Ventana;
 
 public class AdminCurso extends JFrame {
 
@@ -32,17 +31,15 @@ public class AdminCurso extends JFrame {
     private JTable alumnos, actividades;
     public DefaultTableModel modalum, modacti;
     public JScrollPane scrolalumnos, scrolacti;
-    private JLabel titulo, list, acti, repor, crear, acumul,acum, nom, des, pon, not;
+    public static JLabel titulo, list, acti, repor, crear, acumul,acum, nom, des, pon, not;
     private JButton masiva, top1, top2, arcsv, nueva;
     private JTextField nombre, descrip, ponde;
     private FileDialog fd, fd2;
     Alumno[] alumnomasivo = new Alumno[50];
-    Alumno aux;
     private boolean csv=false;
     String[][] notas;
     private float prom=0;
     private float acumulado=0;
-
     public AdminCurso() {
         setSize(850, 500);
         setLocationRelativeTo(null);
@@ -69,7 +66,7 @@ public class AdminCurso extends JFrame {
     }
 
     private void etiquetas() {
-        titulo = new JLabel("Clase");
+        titulo = new JLabel("clase");
         list = new JLabel("Listado de Alumnos");
         acti = new JLabel("Actividades");
         repor = new JLabel("Reportes");
@@ -144,7 +141,6 @@ public class AdminCurso extends JFrame {
         ActionListener acc2 = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-
             }
         };
         top1.addActionListener(acc2);
@@ -269,7 +265,7 @@ public class AdminCurso extends JFrame {
         Gson gson = new Gson();
         Alumno[] cop = gson.fromJson(Json, Alumno[].class);
         for (int i = 0; i < cop.length; i++) {
-            if (cop.length == alumnomasivo.length) {
+            if (i == alumnomasivo.length) {
                 JOptionPane.showMessageDialog(null, "Limite de alumnos alcanzado");
                 break;
             }
@@ -277,7 +273,7 @@ public class AdminCurso extends JFrame {
             //System.out.println(cop[i].getCodigo());
             //alumnomasivo[i].setCodigo(cop[i].getCodigo());
 
-            for (int j = 0; j < cop.length; j++) {
+         /*   for (int j = 0; j < cop.length; j++) {
                 if (alumnomasivo[i].getCodigo() == agalumno.nuevoalumno[i].getCodigo()) {
                     jeto[0] = agalumno.nuevoalumno[i].getCodigo();
                     jeto[1] = agalumno.nuevoalumno[i].getNombre();
@@ -285,7 +281,7 @@ public class AdminCurso extends JFrame {
                     jeto[3] = "Ver mas informacion";
                 }
 
-            }
+            }*/
             anadirfila(jeto);
 
         }
@@ -343,5 +339,4 @@ public class AdminCurso extends JFrame {
 
         return matriz;
     }
-
 }

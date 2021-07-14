@@ -240,7 +240,7 @@ public class panelalumnos extends JPanel {
         Gson gson = new Gson();
         Alumno[] cop = gson.fromJson(Json, Alumno[].class);
         for (int i = 0; i < cop.length; i++) {
-            if (cop.length == nuevoalumno.length) {
+            if (i == nuevoalumno.length) {
                 JOptionPane.showMessageDialog(null, "Limite de alumnos alcanzado");
                 break;
             }

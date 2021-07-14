@@ -14,7 +14,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import main.Principal;
-import static main.Principal.ag;
 import main.Ventana;
 
 
@@ -60,7 +59,7 @@ public class ModActualizar extends JFrame {
     }
 
     private void txtbox() {
-        if(ag.profes[codi]==null){
+    /*    if(ag.profes[codi]==null){
           txtnombre = new JTextField("");
         txtapellido = new JTextField("");
         txtcorreo = new JTextField("");
@@ -70,7 +69,7 @@ public class ModActualizar extends JFrame {
         txtapellido = new JTextField(ag.profes[codi].getApellido());
         txtcorreo = new JTextField(ag.profes[codi].getCorreo());
         txtcontra = new JTextField(ag.profes[codi].getContraseña());
-        }
+        }*/
         txtnombre.setBounds(100, 45, 200, 25);
         txtapellido.setBounds(100, 85, 200, 25);
         txtcorreo.setBounds(100, 125, 200, 25);
@@ -135,14 +134,7 @@ public class ModActualizar extends JFrame {
             }
         };actu.addActionListener(acc);
     }
-    public void buscar(int ind){
-         try {
-            prin.carnt();
-        } catch (IOException ex) {
-            Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
-        }
+   /* public void buscar(int ind){
         int gen=0;
         if("f".equals(ag.profes[ind].getGenero())){
             gen=1;
@@ -161,5 +153,5 @@ public class ModActualizar extends JFrame {
         txtcorreo.setText(ag.profes[ind].getCorreo());
         txtcontra.setText(ag.profes[ind].getContraseña());
         combo.setSelectedIndex(gen);
-    }
+    }*/
 }

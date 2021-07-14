@@ -10,10 +10,10 @@ import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import static javax.swing.JFrame.EXIT_ON_CLOSE;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import main.Actualizar;
 import main.Principal;
-import static main.Principal.agcursos1;
 import main.Ventana;
 
 public class ModProfesor extends JFrame {
@@ -24,8 +24,9 @@ public class ModProfesor extends JFrame {
     static Ventana venta;
     ModActualizar act = new ModActualizar();
     Principal prin = new Principal();
-    // static AgregarCursos agcursos1;
-    // private int[] cantidadcurso;
+    
+    public static JButton boton[] = new JButton[50];
+    public static JLabel clases[] = new JLabel[50];
 
     public ModProfesor() {
         setSize(850, 500);
@@ -49,7 +50,6 @@ public class ModProfesor extends JFrame {
     }
 
     private void componentes() {
-
         panel();
         botones();
     }
@@ -62,13 +62,6 @@ public class ModProfesor extends JFrame {
     }
 
     private void botones() {
-        try {
-            prin.cargaCursosnt();
-        } catch (IOException ex) {
-            Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
-        }
         cerrar = new JButton("Cerrar Sesión");
         actual = new JButton("Actualizar Datos");
         cerrar.setEnabled(true);
@@ -97,7 +90,7 @@ public class ModProfesor extends JFrame {
         actual.addActionListener(accion2);
     }
 
-    public void comparar(int comra) {
+   /*public void comparar(int comra) {
         int con = 0;
         //System.out.println(comra);
         for (int i = 0; i < agcursos1.nuevocurso.length; i++) {
@@ -112,5 +105,7 @@ public class ModProfesor extends JFrame {
         }
         codigo = con;
     }
+*/
+
     
 }

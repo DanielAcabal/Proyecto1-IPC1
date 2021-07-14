@@ -1,8 +1,8 @@
 package main;
 
 import Cursos.ActualizarCursos;
-import Cursos.AgregarCursos;
 import Cursos.Cursos;
+import Cursos.AgregarCursos;
 import com.google.gson.Gson;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
@@ -15,27 +15,19 @@ import java.awt.FileDialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
-import static main.Principal.ag;
-import static main.Principal.agcursos1;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.data.general.DefaultPieDataset;
 
 public class panelcursos extends JPanel {
 
@@ -44,10 +36,8 @@ public class panelcursos extends JPanel {
     private static JTable tablacursos;
     public DefaultTableModel modCursos;
     public JScrollPane scursos;
-    AgregarCursos agcursos = new AgregarCursos();
-    ActualizarCursos actcursos = new ActualizarCursos();
-    Principal prin = new Principal();
-
+    private ListSelectionModel listSelectionModel;
+    public static int selectedRow;
     public panelcursos() {
         setLayout(null);
         label1 = new JLabel();
@@ -55,7 +45,6 @@ public class panelcursos extends JPanel {
         label1.setText("Listado Oficial Cursos");
         label1.setBounds(10, 10, 150, 15);
         componentes();
-        //agcursos.igual();
         add(label1);
     }
 
@@ -87,21 +76,29 @@ public class panelcursos extends JPanel {
         ActionListener accion = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-                try {
-                    prin.carnt();
-                } catch (IOException ex) {
-                    Logger.getLogger(AgregarCursos.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(AgregarCursos.class.getName()).log(Level.SEVERE, null, ex);
+                int contador=0;
+                for (int i = 0; i < AgregarCursos.nuevocurso.length; i++) {
+                   if (AgregarCursos.nuevocurso[i]==null){
+                       break;
+                   }else{
+                    contador++;
+                   }
                 }
-                agcursos.setVisible(true);
+                if (contador==50){
+                    JOptionPane.showMessageDialog(null, "No pueden haber mas de 50 cursos");
+                }else{
+
+                    AgregarCursos agcursos = new AgregarCursos();
+                    agcursos.setVisible(true);
+                }
             }
 
         };
-        crear.addActionListener(accion);
+        crear.addActionListener(accion);//YA
         ActionListener accion2 = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
+                ActualizarCursos actcursos = new ActualizarCursos();
                 actcursos.setVisible(true);
             }
 
@@ -118,30 +115,29 @@ public class panelcursos extends JPanel {
             }
 
         };
-        exportar.addActionListener(accion3);
+        exportar.addActionListener(accion3);//YA
         ActionListener accion4 = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
                 FileDialog fda = new FileDialog(new JFrame(), "Abrir");
                 fda.setVisible(true);
-                System.out.println(fda.getDirectory());
                 if ("null".equals(fda.getDirectory())) {
                     JOptionPane.showMessageDialog(null, "Por favor seleccione un archivo");
                 } else {
-                    // JOptionPane.showMessageDialog(null,fda.getDirectory()+fda.getFile());
                     cargamasiva(fda.getDirectory() + fda.getFile());
 
                 }
             }
 
         };
-        masiva.addActionListener(accion4);
+        masiva.addActionListener(accion4);//YA
     }
 
     private void componentes() {
         botones();
         tabla();
         grafica();
+        CargaCurso();
     }
 
     private void tabla() {
@@ -155,12 +151,26 @@ public class panelcursos extends JPanel {
         scursos = new JScrollPane(tablacursos);
         tablacursos.setBounds(10, 30, 480, 425);
         scursos.setBounds(10, 30, 480, 425);
-        //scroll.setEnabled(false);
         tablacursos.setBackground(Color.gray);
-        tablacursos.setEnabled(false);
-
         add(scursos);
-
+        listSelectionModel = tablacursos.getSelectionModel();
+        listSelectionModel.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                selectedRow = tablacursos.getSelectedRow();
+               for (Cursos curso: AgregarCursos.nuevocurso) {
+                    if (curso!=null){
+                    if (curso.getCodigo()==Integer.parseInt(tablacursos.getValueAt(selectedRow,0).toString())) {
+                        /*ActualizarCursos.txtcodigo.setText(curso.getCodigo() + "");
+                        ActualizarCursos.txtnombre.setText(curso.getNombre());
+                        ActualizarCursos.txtcreditos.setText(curso.getCreditos() + "");*/
+                        System.out.println(ActualizarCursos.txtcodigo);
+                        break;
+                        }
+                        }
+                    }
+                }
+        });
     }
 
     public static void anadirfila(Object[] dataRow) {
@@ -169,8 +179,7 @@ public class panelcursos extends JPanel {
     }
 
     private void pdf() throws IOException {
-
-        int conta = 0;
+        String prof="";
         String path = "ListadoCursos.pdf";
         PdfWriter lapiz = new PdfWriter(path);
 
@@ -191,92 +200,71 @@ public class panelcursos extends JPanel {
         tabla.addCell(new Cell().add(new Paragraph("Creditos")));
         tabla.addCell(new Cell().add(new Paragraph("Alumnos")));
         tabla.addCell(new Cell().add(new Paragraph("Profesor")));
-        for (int i = 0; i < agcursos1.nuevocurso.length; i++) {
-            if (agcursos1.nuevocurso[i] == null) {
-                break;
-
-            } else {
-                tabla.addCell(new Cell().add(new Paragraph(agcursos1.nuevocurso[i].getCodigo() + "")));
-                tabla.addCell(new Cell().add(new Paragraph(agcursos1.nuevocurso[i].getNombre())));
-                tabla.addCell(new Cell().add(new Paragraph(agcursos1.nuevocurso[i].getCreditos() + "")));
-                tabla.addCell(new Cell().add(new Paragraph(agcursos1.nuevocurso[i].getAlumnos() + "")));
-                for (int j = 0; j < agcursos1.nuevocurso.length; j++) {
-                    if (ag.profes[j] == null || agcursos1.nuevocurso[i] == null) {
-                        break;
-                    } else if (agcursos1.nuevocurso[i].getProfesores() == ag.profes[j].getCodigo()) {
-
-                        conta = j;
-                        break;
+        for (int i = 0; i < AgregarCursos.nuevocurso.length; i++) {
+            if (AgregarCursos.nuevocurso[i] != null) {
+                tabla.addCell(new Cell().add(new Paragraph(AgregarCursos.nuevocurso[i].getCodigo() + "")));
+                tabla.addCell(new Cell().add(new Paragraph(AgregarCursos.nuevocurso[i].getNombre())));
+                tabla.addCell(new Cell().add(new Paragraph(AgregarCursos.nuevocurso[i].getCreditos() + "")));
+                tabla.addCell(new Cell().add(new Paragraph(AgregarCursos.nuevocurso[i].getAlumnos() + "")));
+                for (int j = 0; j < AgregarProfesores.profes.length; j++) {
+                    if (AgregarProfesores.profes[j] != null) {
+                        if (AgregarCursos.nuevocurso[i].getProfesores() == AgregarProfesores.profes[j].getCodigo()) {
+                           prof = AgregarProfesores.profes[j].getNombre() + " " + AgregarProfesores.profes[j].getApellido();
+                            break;
+                        }else{
+                            prof = "Nadie" ;
+                        }
                     }
-
                 }
-                tabla.addCell(new Cell().add(new Paragraph(ag.profes[conta].getNombre() + " " + ag.profes[conta].getApellido())));
+                tabla.addCell(new Cell().add(new Paragraph(prof)));
             }
         }
         documento.add(tabla);
         documento.close();
-        System.out.println("PDF Creado");
+        JOptionPane.showMessageDialog(null,"PDF Listado de Curso Creado");
 
     }
 
     private void cargamasiva(String ruta) {
-        try {
-            prin.car();
-        } catch (IOException ex) {
-            Logger.getLogger(panelcursos.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(panelcursos.class.getName()).log(Level.SEVERE, null, ex);
-        }
         Object[] je = new Object[5];
-        BufferedReader br = null;
-        int cod = 0;
-        String Json = "";
+        BufferedReader br;
+        StringBuilder Json = new StringBuilder();
         try {
             br = new BufferedReader(new FileReader(ruta));
 
             String linea;
             while ((linea = br.readLine()) != null) {
-                Json += linea;
+                Json.append(linea);
             }
             br.close();
 
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(panelcursos.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(panelcursos.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-        System.out.println(Json);
         Gson gson = new Gson();
-        Cursos[] cop = gson.fromJson(Json, Cursos[].class);
+        Cursos[] cop = gson.fromJson(Json.toString(), Cursos[].class);
         for (int i = 0; i < cop.length; i++) {
             je[0] = cop[i].getCodigo();
             je[1] = cop[i].getNombre();
             je[2] = cop[i].getCreditos();
             je[3] = 0;
-            for (int j = 0; j < ag.profes.length; j++) {
-                if (ag.profes[j] == null) {
-                    break;
+            for (int j = 0; j < AgregarProfesores.profes.length; j++) {
+                if (AgregarProfesores.profes[j] != null) {
+                    if (cop[i].getProfesores() == AgregarProfesores.profes[j].getCodigo()) {
+                        je[4] = AgregarProfesores.profes[j].getNombre() + " " + AgregarProfesores.profes[j].getApellido();
+                        break;
+                    }else{
+                        je[4] = "Nadie";
+                    }
                 }
-                if (cop.length == 50) {
-                    JOptionPane.showMessageDialog(null, "Límite de cursos alcanzado");
-                    break;
-                }
-
-                if (cop[i].getProfesores() == ag.profes[j].getCodigo()) {
-                    //System.out.println("Suma cod");
-                    cod = j;
-                }
-
             }
-            //System.out.println(cod);
-            je[4] = ag.profes[cod].getNombre() + " " + ag.profes[cod].getApellido();
-            anadirfila(je);
-            //System.out.println(ag.profes[cod].getNombre() + " " + ag.profes[cod].getApellido());
-            //agcursos.igual(cop);
-            //System.out.println("obj " + i + " " + cop);
+            if (AgregarCursos.x<50){
+                AgregarCursos.nuevocurso[AgregarCursos.x] = cop[i];
+                AgregarCursos.x++;
+                anadirfila(je);
+            }
         }
-        agcursos.igual(cop);
+        Cargas.Serializar.serializar(AgregarCursos.nuevocurso,"cursos.bin",false);
     }
 
     public static void actualizarfila(String c, String n, String a, String al, String co) {
@@ -327,6 +315,34 @@ public class panelcursos extends JPanel {
         contenedor.setBackground(Color.WHITE);
         add(contenedor);
         validate();
+    }
+    private void CargaCurso(){
+        AgregarCursos.x=0;
+        Cursos[] aux= (Cursos[]) Cargas.Serializar.getSerializable("cursos.bin");
+        Object[] objects = new Object[5];
+        if (aux != null) {
+            for (int i = 0; i < 50; i++) {
+                if (aux[i]!=null){
+                    objects[0] = aux[i].getCodigo();
+                    objects[1] = aux[i].getNombre();
+                    objects[2] = aux[i].getCreditos();
+                    objects[3] = aux[i].getAlumnos();
+                    for (int j = 0; j < AgregarProfesores.profes.length; j++) {
+                        if (AgregarProfesores.profes[j] != null) {
+                            if (aux[i].getProfesores() == AgregarProfesores.profes[j].getCodigo()) {
+                                objects[4] = AgregarProfesores.profes[j].getNombre() + " " + AgregarProfesores.profes[j].getApellido();
+                                break;
+                            }else{
+                                objects[4] = "Nadie";
+                            }
+                        }
+                    }
+                    anadirfila(objects);
+                    AgregarCursos.x++;
+                }
+            }
+            AgregarCursos.nuevocurso = aux;
+        }
     }
 
 }
