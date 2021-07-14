@@ -41,12 +41,12 @@ public class panelalumnos extends JPanel {
     private JLabel label1;
     private JButton masiva, exportar;
     private static JTable tablalumnos;
-    public DefaultTableModel modalumnos;
-    public JScrollPane scrolalumnos;
+    private  DefaultTableModel modalumnos;
+    private JScrollPane scrolalumnos;
     private FileDialog fd;
-    public Alumno[] nuevoalumno = new Alumno[300];
-    Alumno aux;
-    private int conM = 0, conH = 0;
+    public static Alumno[] nuevoalumno = new Alumno[300];
+    private  DefaultPieDataset dataset;
+    private int conM = 0, conH = 0,x;
 
     public panelalumnos() {
         setLayout(null);
@@ -105,6 +105,7 @@ public class panelalumnos extends JPanel {
         botones();
         tabla();
         ColocarGrafica();
+        CargaAlumno();
     }
 
     private void tabla() {
@@ -131,24 +132,8 @@ public class panelalumnos extends JPanel {
     }
     
     public void ColocarGrafica() {
-
-        try {
-            contar2();
-        } catch (IOException ex) {
-            Logger.getLogger(PanelProfesor.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(PanelProfesor.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        int REPm = conH;
-        int REPf = conM;
-
-        DefaultPieDataset dataset = new DefaultPieDataset();
-        dataset.setValue("Mujeres", (REPm));
-        dataset.setValue("Hombres", (REPf));
-
+        dataset = new DefaultPieDataset();
         JFreeChart graf = ChartFactory.createPieChart("Genero de Alumnos",dataset,false,true, false);
-
         ChartPanel contenedor = new ChartPanel(graf);
         contenedor.setBounds(500, 130, 315, 280);
         contenedor.setBackground(Color.WHITE);
@@ -156,30 +141,6 @@ public class panelalumnos extends JPanel {
         validate();
     }
 
-    public void contar2() throws IOException, ClassNotFoundException {
-        int i = 0;
-        try {
-            File archivo = new File("Alumnos.bin");
-            if (archivo.exists()){
-            FileInputStream fs = new FileInputStream("Alumnos.bin");
-            ObjectInputStream oi;
-            while (fs.available() > 0) {
-                oi = new ObjectInputStream(fs);
-                nuevoalumno[i] = (Alumno) oi.readObject();
-                if ("m".equals(nuevoalumno[i].getGenero())) {
-
-                    conM++; 
-                } else {
-
-                    conH++;
-                }
-                i++;
-            }
-            }
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
    
 
     private void pdf() throws IOException {
@@ -213,57 +174,78 @@ public class panelalumnos extends JPanel {
         }
         documento.add(tabla);
         documento.close();
-        System.out.println("PDF Creado");
+        JOptionPane.showMessageDialog(null,"PDF Alumnos ha sido creado");
 
     }
 
     private void cargamasiva(String ruta) {
         Object[] jeto = new Object[5];
-        BufferedReader br = null;
-        String Json = "";
+        BufferedReader br;
+        StringBuilder Json = new StringBuilder();
         try {
             br = new BufferedReader(new FileReader(ruta));
 
             String linea;
             while ((linea = br.readLine()) != null) {
-                Json += linea;
+                Json.append(linea);
             }
             br.close();
 
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(panelcursos.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(panelcursos.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        //System.out.println(Json);
         Gson gson = new Gson();
-        Alumno[] cop = gson.fromJson(Json, Alumno[].class);
+        Alumno[] cop = gson.fromJson(Json.toString(), Alumno[].class);
         for (int i = 0; i < cop.length; i++) {
-            if (i == nuevoalumno.length) {
-                JOptionPane.showMessageDialog(null, "Limite de alumnos alcanzado");
-                break;
+            if (x<300){
+            nuevoalumno[x] = new Alumno(cop[i].getCodigo(), cop[i].getNombre(), cop[i].getApellido(), cop[i].getCorreo(), cop[i].getGenero(), "1234");
+            jeto[0] = nuevoalumno[x].getCodigo();
+            jeto[1] = nuevoalumno[x].getNombre();
+            jeto[2] = nuevoalumno[x].getApellido();
+            jeto[3] = nuevoalumno[x].getCorreo();
+            jeto[4] = nuevoalumno[x].getGenero();
+            if (nuevoalumno[x].getGenero().equals("m")){
+                conH++;
+                dataset.setValue("Hombres",conH);
+            }else if (nuevoalumno[x].getGenero().equals("f")){
+                conM++;
+                dataset.setValue("Mujeres",conM);
             }
-            nuevoalumno[i] = new Alumno(cop[i].getCodigo(), cop[i].getNombre(), cop[i].getApellido(), cop[i].getCorreo(), cop[i].getGenero(), "1234");
-            aux = nuevoalumno[i];
-            jeto[0] = cop[i].getCodigo();
-            jeto[1] = cop[i].getNombre();
-            jeto[2] = cop[i].getApellido();
-            jeto[3] = cop[i].getCorreo();
-            jeto[4] = cop[i].getGenero();
             anadirfila(jeto);
-            try {
-                ser2(aux);
-            } catch (IOException ex) {
-                Logger.getLogger(panelalumnos.class.getName()).log(Level.SEVERE, null, ex);
+            x++;
             }
         }
+        Cargas.Serializar.serializar(nuevoalumno,"alumnos.bin",false);
     }
-
-    public void ser2(Alumno objetos) throws FileNotFoundException, IOException {
-        ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream("Alumnos.bin",true));
-        os.writeObject(objetos); 
-        os.close();
+    private void CargaAlumno(){
+        x=0;
+        conH=0;
+        conM=0;
+        Alumno[] aux= (Alumno[]) Cargas.Serializar.getSerializable("alumnos.bin");
+        Object[] objects = new Object[5];
+        if (aux != null) {
+            for (int i = 0; i < 50; i++) {
+                if (aux[i]!=null){
+                    objects[0] = aux[i].getCodigo();
+                    objects[1] = aux[i].getNombre();
+                    objects[2] = aux[i].getApellido();
+                    objects[3] = aux[i].getCorreo();
+                    objects[4] = aux[i].getGenero();
+                    anadirfila(objects);
+                    if (aux[i].getGenero().equals("m")){
+                        conH++;
+                        dataset.setValue("Hombres",conH);
+                    }
+                    else if (aux[i].getGenero().equals("f")){
+                        conM++;
+                        dataset.setValue("Mujeres",conM);
+                    }
+                    x++;
+                }
+            }
+            nuevoalumno = aux;
+        }
     }
 
 }

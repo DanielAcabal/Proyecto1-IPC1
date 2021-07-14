@@ -20,12 +20,12 @@ import main.panelcursos;
 
 public class ActualizarCursos extends JFrame{
     private JPanel panel;
-    public static JTextField txtcodigo, txtnombre, txtcreditos;
+    private JTextField txtcodigo, txtnombre, txtcreditos;
     private JLabel profesor;
     private JComboBox combo;
-    public JButton agregar,buscar;
+    private JButton agregar,buscar;
     
-     public ActualizarCursos() {
+    public ActualizarCursos() {
         setLocationRelativeTo(null);
         setSize(400, 300);
         componentes();
@@ -89,22 +89,44 @@ public class ActualizarCursos extends JFrame{
         panel.add(combo);
     }
 
-    public void actu() {
+    private void actu() {
        
         agregar = new JButton("Actualizar");
         agregar.setBounds(137, 210, 125, 25);
-        buscar = new JButton("Buscar");
-        buscar.setBounds(260, 20, 100, 25);
-        panel.add(buscar);
         panel.add(agregar);
        ActionListener accion = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-                String hola = "";
-
-              //  panelcursos.actualizarfila(txtcodigo.getText(), txtnombre.getText(), txtcreditos.getText(),"0", hola);
+                for (Cursos curso: AgregarCursos.nuevocurso) {
+                    if (curso != null){
+                        if (curso.getCodigo() == Integer.parseInt(txtcodigo.getText())){
+                            curso.setNombre(txtnombre.getText());
+                            curso.setCreditos(Integer.parseInt(txtcreditos.getText()));
+                            curso.setProfesores(combo.getSelectedIndex()+1);
+                            panelcursos.actualizarfila(txtcodigo.getText(), txtnombre.getText(), txtcreditos.getText(),curso.getAlumnos(), curso.getProfesores());
+                            break;
+                        }
+                    }
+                }
+                Cargas.Serializar.serializar(AgregarCursos.nuevocurso,"cursos.bin",false);
             }
         };
         agregar.addActionListener(accion);
+    }
+
+    public JTextField getTxtcodigo() {
+        return txtcodigo;
+    }
+
+    public JTextField getTxtnombre() {
+        return txtnombre;
+    }
+
+    public JTextField getTxtcreditos() {
+        return txtcreditos;
+    }
+
+    public JComboBox getCombo() {
+        return combo;
     }
 }

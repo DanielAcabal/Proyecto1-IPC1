@@ -1,8 +1,10 @@
+
 package main;
 
-import Cursos.ActualizarCursos;
 import Cursos.Cursos;
 import Cursos.AgregarCursos;
+import Cursos.ActualizarCursos;
+
 import com.google.gson.Gson;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
@@ -32,12 +34,18 @@ import org.jfree.data.category.DefaultCategoryDataset;
 public class panelcursos extends JPanel {
 
     private JLabel label1;
-    private JButton crear, masiva, actualizar, eliminar, exportar;
-    private static JTable tablacursos;
-    public DefaultTableModel modCursos;
-    public JScrollPane scursos;
+    private JButton masiva;
+    private JButton actualizar;
+    private JButton eliminar;
+    private JButton exportar;
+
+    private static DefaultTableModel modCursos;
     private ListSelectionModel listSelectionModel;
-    public static int selectedRow;
+    private static JTable tablacursos;
+    private JScrollPane scursos;
+    private int selectedRow;
+
+    private ActualizarCursos actcursos = new ActualizarCursos();
     public panelcursos() {
         setLayout(null);
         label1 = new JLabel();
@@ -49,7 +57,7 @@ public class panelcursos extends JPanel {
     }
 
     private void botones() {
-        crear = new JButton("Crear");
+        JButton crear = new JButton("Crear");
         masiva = new JButton("Carga Masiva");
         actualizar = new JButton("Actualizar");
         eliminar = new JButton("Eliminar");
@@ -98,10 +106,8 @@ public class panelcursos extends JPanel {
         ActionListener accion2 = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-                ActualizarCursos actcursos = new ActualizarCursos();
                 actcursos.setVisible(true);
             }
-
         };
         actualizar.addActionListener(accion2);
         ActionListener accion3 = new ActionListener() {
@@ -131,6 +137,27 @@ public class panelcursos extends JPanel {
 
         };
         masiva.addActionListener(accion4);//YA
+        eliminar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (tablacursos.getSelectedRowCount()==1) {
+                    for (int i = 0; i < AgregarCursos.nuevocurso.length; i++) {
+                        if (AgregarCursos.nuevocurso[i] != null) {
+                            if (AgregarCursos.nuevocurso[i].getCodigo() == (int) tablacursos.getValueAt(selectedRow, 0)) {
+                                AgregarCursos.nuevocurso[i] = null;
+                                PanelProfesor.reOrdenar(AgregarCursos.nuevocurso, i);
+                                modCursos.removeRow(selectedRow);
+                                JOptionPane.showMessageDialog(null, "Curso eliminado");
+                                break;
+                            }
+                        }
+                    }
+                    Cargas.Serializar.serializar(AgregarCursos.nuevocurso, "cursos.bin", false);
+                }else{
+                    JOptionPane.showMessageDialog(null,"Seleccione una fila");
+                }
+            }
+        });
     }
 
     private void componentes() {
@@ -147,6 +174,7 @@ public class panelcursos extends JPanel {
         modCursos.addColumn("Creditos");
         modCursos.addColumn("Alumnos");
         modCursos.addColumn("Profesor");
+
         tablacursos = new JTable(modCursos);
         scursos = new JScrollPane(tablacursos);
         tablacursos.setBounds(10, 30, 480, 425);
@@ -157,19 +185,22 @@ public class panelcursos extends JPanel {
         listSelectionModel.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                selectedRow = tablacursos.getSelectedRow();
-               for (Cursos curso: AgregarCursos.nuevocurso) {
-                    if (curso!=null){
-                    if (curso.getCodigo()==Integer.parseInt(tablacursos.getValueAt(selectedRow,0).toString())) {
-                        /*ActualizarCursos.txtcodigo.setText(curso.getCodigo() + "");
-                        ActualizarCursos.txtnombre.setText(curso.getNombre());
-                        ActualizarCursos.txtcreditos.setText(curso.getCreditos() + "");*/
-                        System.out.println(ActualizarCursos.txtcodigo);
-                        break;
-                        }
+                if (!listSelectionModel.isSelectionEmpty()) {
+                    selectedRow = tablacursos.getSelectedRow();
+                    for (Cursos curso : AgregarCursos.nuevocurso) {
+                        if (curso != null) {
+                            if (curso.getCodigo() == Integer.parseInt(tablacursos.getValueAt(selectedRow, 0).toString())) {
+                                actcursos.getTxtcodigo().setText(curso.getCodigo() + "");
+                                actcursos.getTxtcodigo().setEnabled(false);
+                                actcursos.getTxtnombre().setText(curso.getNombre());
+                                actcursos.getTxtcreditos().setText(curso.getCreditos() + "");
+                                actcursos.getCombo().setSelectedIndex(curso.getProfesores() - 1);
+                                break;
+                            }
                         }
                     }
                 }
+            }
         });
     }
 
@@ -267,15 +298,21 @@ public class panelcursos extends JPanel {
         Cargas.Serializar.serializar(AgregarCursos.nuevocurso,"cursos.bin",false);
     }
 
-    public static void actualizarfila(String c, String n, String a, String al, String co) {
+    public static void actualizarfila(String c, String n, String a, int al, int co) {
         int fila = 0;
-        DefaultTableModel mod2 = (DefaultTableModel) tablacursos.getModel();
         String[] info = new String[5];
         info[0] = c;
         info[1] = n;
         info[2] = a;
-        info[3] = al;
-        info[4] = co;
+        info[3] = String.valueOf(al);
+        for (CrearProfesores profe: AgregarProfesores.profes ) {
+            if (profe!=null){
+                if(profe.getCodigo()==co){
+                    info[4] = profe.getNombre() + profe.getApellido();
+                    break;
+                }
+            }
+        }
         for (int i = 0; i < 50; i++) {
             if (c.equals(String.valueOf(tablacursos.getValueAt(i, 0)))) {
                 fila = i;
@@ -285,7 +322,7 @@ public class panelcursos extends JPanel {
         }
 
         for (int i = 0; i < tablacursos.getColumnCount(); i++) {
-            mod2.setValueAt(info[i], fila, i);
+            modCursos.setValueAt(info[i], fila, i);
 
         }
     }

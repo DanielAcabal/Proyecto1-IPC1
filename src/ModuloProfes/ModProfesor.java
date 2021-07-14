@@ -21,9 +21,7 @@ public class ModProfesor extends JFrame {
     private int codigo;
     public JPanel panel;
     private JButton cerrar, actual;
-    static Ventana venta;
     ModActualizar act = new ModActualizar();
-    Principal prin = new Principal();
     
     public static JButton boton[] = new JButton[50];
     public static JLabel clases[] = new JLabel[50];
@@ -34,7 +32,6 @@ public class ModProfesor extends JFrame {
         setMinimumSize(new Dimension(500, 540));
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setTitle("Módulo de profesores");
-
         componentes();
 
     }

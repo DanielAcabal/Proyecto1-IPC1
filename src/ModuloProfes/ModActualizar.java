@@ -13,6 +13,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+
+import main.AgregarProfesores;
 import main.Principal;
 import main.Ventana;
 
@@ -59,17 +61,17 @@ public class ModActualizar extends JFrame {
     }
 
     private void txtbox() {
-    /*    if(ag.profes[codi]==null){
+        if(AgregarProfesores.profes[codi]==null){
           txtnombre = new JTextField("");
         txtapellido = new JTextField("");
         txtcorreo = new JTextField("");
         txtcontra = new JTextField("");  
         }else{
-        txtnombre = new JTextField(ag.profes[codi].getNombre());
-        txtapellido = new JTextField(ag.profes[codi].getApellido());
-        txtcorreo = new JTextField(ag.profes[codi].getCorreo());
-        txtcontra = new JTextField(ag.profes[codi].getContraseña());
-        }*/
+        txtnombre = new JTextField(AgregarProfesores.profes[codi].getNombre());
+        txtapellido = new JTextField(AgregarProfesores.profes[codi].getApellido());
+        txtcorreo = new JTextField(AgregarProfesores.profes[codi].getCorreo());
+        txtcontra = new JTextField(AgregarProfesores.profes[codi].getContraseña());
+        }
         txtnombre.setBounds(100, 45, 200, 25);
         txtapellido.setBounds(100, 85, 200, 25);
         txtcorreo.setBounds(100, 125, 200, 25);

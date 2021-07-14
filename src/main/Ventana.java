@@ -1,5 +1,8 @@
 package main;
 
+import Cursos.AgregarCursos;
+import ModuloProfes.ModProfesor;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -16,7 +19,8 @@ public class Ventana extends JFrame {
     private JPanel panel;
     public JTextField txtcodigo;
     private JPasswordField txtcontra;
-
+    public static Admin admin;
+    private ModProfesor modProfesor = new ModProfesor();
 
     public Ventana() {
         setSize(600, 400); //Tamaño de la ventana
@@ -65,12 +69,13 @@ public class Ventana extends JFrame {
             public void actionPerformed(ActionEvent ae) {
                 if ("admin".equals(txtcodigo.getText()) && "admin".equals(txtcontra.getText())) {
                     dispose();
-                    Admin admin = new Admin();
+                    admin = new Admin();
                     admin.setVisible(true);
                 }  else {
-                    JOptionPane.showMessageDialog(null, "Datos erróneos, Porfavor inténtelo de nuevo");
+                    buscar(txtcodigo.getText(),txtcontra.getText());
+                    /*JOptionPane.showMessageDialog(null, "Datos erróneos, Porfavor inténtelo de nuevo");
                     txtcodigo.setText("");
-                    txtcontra.setText("");
+                    txtcontra.setText("");*/
                 }
 
             }
@@ -89,70 +94,52 @@ public class Ventana extends JFrame {
         panel.add(txtcodigo);
         panel.add(txtcontra);
     }
-/*
+
     private void buscar(String user, String con) {
-        try {
-            prin.carnt();
-        } catch (IOException ex) {
-            Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
-        }
         int contador = 0;
         while (contador < 50) {
-            if (ag.profes[contador] == null) {
-                //System.out.println("nada" + contador);
+            if (AgregarProfesores.profes[contador] == null) {
                 JOptionPane.showMessageDialog(null, "Datos erróneos, Porfavor inténtelo de nuevo");
                 txtcodigo.setText("");
                 txtcontra.setText("");
                 break;
             }
-            if (ag.profes[contador].getCodigo() == Integer.parseInt(user)) {
-                if (con.equals(ag.profes[contador].getContraseña())) {
+            if (AgregarProfesores.profes[contador].getCodigo() == Integer.parseInt(user)) {
+                if (con.equals(AgregarProfesores.profes[contador].getContraseña())) {
                     bot(Integer.parseInt(user));
-                    profe = user;
-                    gi[0] = Integer.parseInt(user);
-
                     dispose();
-                    modprofe.setVisible(true);
+                    modProfesor.setVisible(true);
                     break;
                 }
             }
             contador++;
 
         }
-        //}
-    }
+        }
 
     public void bot(int cod) {
         int contador = 0;
-        //System.out.println("Cpdigo profe:" + cod);
-        JButton[] boton2 = new JButton[50];
-        for (int i = 0; i < agcursos1.nuevocurso.length; i++) {
-            if (agcursos1.nuevocurso[i] == null) {
+        for (int i = 0; i < AgregarCursos.nuevocurso.length; i++) {
+            if (AgregarCursos.nuevocurso[i] == null) {
                 break;
             }
-            if (agcursos1.nuevocurso[i].getProfesores() == cod) {
+            if (AgregarCursos.nuevocurso[i].getProfesores() == cod) {
                 ModProfesor.boton[contador] = new JButton();
                 ModProfesor.clases[contador] = new JLabel();
-                ModProfesor.boton[contador].setText(agcursos1.nuevocurso[i].getNombre());
-                curso = agcursos1.nuevocurso[i].getNombre();
-                ModProfesor.clases[contador].setText(curso);
-                //System.out.println(boton2[contador].getText()+"contador: "+contador);
+                ModProfesor.boton[contador].setText(AgregarCursos.nuevocurso[i].getNombre());
+                ModProfesor.clases[contador].setText(AgregarCursos.nuevocurso[i].getNombre());
                 ModProfesor.boton[contador].setEnabled(true);
                 ModProfesor.boton[contador].setBounds(260, (20 + 50 * contador), 200, 25);
                 ModProfesor.boton[contador].addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        adcurso = new AdminCurso();
-                        adcurso.setVisible(true);
                     }
                 }); 
-                modprofe.panel.add(ModProfesor.boton[contador]);
+                modProfesor.panel.add(ModProfesor.boton[contador]);
                 contador++;
             }
         }
 
     }
 
-*/
+
 }

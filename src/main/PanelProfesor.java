@@ -33,7 +33,6 @@ import org.jfree.data.general.DefaultPieDataset;
 public class PanelProfesor extends JPanel {
 
     private JLabel label1;
-    private JPanel grafica;
     private JButton crear, masiva, actualizar, eliminar, exportar, cerrar;
     private static JTable tablaprofesor;
     public DefaultTableModel model;
@@ -42,7 +41,8 @@ public class PanelProfesor extends JPanel {
     public JScrollPane scroll;
     AgregarProfesores profesor = new AgregarProfesores();
     Actualizar act = new Actualizar();
-    public static int conM = 0, conH = 0, selectedRow;
+    public static int conM = 0, conH = 0;
+    private int selectedRow;
     public static DefaultPieDataset dataset;
 
     public PanelProfesor() {
@@ -159,6 +159,7 @@ public class PanelProfesor extends JPanel {
                         AgregarProfesores.profes[i]= null;
                         reOrdenar(AgregarProfesores.profes,i);
                         AgregarProfesores.x--;
+                        model.removeRow(selectedRow);
                         break;
                     }
                 }
@@ -167,6 +168,15 @@ public class PanelProfesor extends JPanel {
 
         };
         eliminar.addActionListener(accion5);
+        cerrar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Ventana.admin.dispose();
+                Ventana.admin.setVisible(false);
+                Ventana ventana = new Ventana();
+                ventana.setVisible(true);
+            }
+        });
     }
 
     private void componentes() {
@@ -193,6 +203,7 @@ public class PanelProfesor extends JPanel {
         listSelectionModel.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
+                if (!listSelectionModel.isSelectionEmpty()){
                     selectedRow = tablaprofesor.getSelectedRow();
                 for (CrearProfesores prof: AgregarProfesores.profes) {
                     if (prof==null){
@@ -207,6 +218,7 @@ public class PanelProfesor extends JPanel {
                         Actualizar.combo.setSelectedIndex(prof.getGenero().equals("m")?1:2);
                         break;
                     }
+                }
                 }
             }
         });
@@ -351,7 +363,7 @@ public class PanelProfesor extends JPanel {
         AgregarProfesores.profes = aux;
         }
     }
-    private void reOrdenar(CrearProfesores[] arr,int lim){
+    public static void reOrdenar(Object[] arr,int lim){
         for (int i = lim; i<arr.length-1 ; i++) {
             arr[i]=arr[i+1];
             arr[arr.length-1] = null;
